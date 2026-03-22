@@ -18,7 +18,7 @@ library(readr)
 
 
 
-How does each president have a negative or positive impact on the economy during their presidency?Typically a republican president would be assumed to make the economy more successful rather than a democratic president. Republican presidents focus more on businesses, deregulation within businesses, tax reduction and energy affordability. These traits of a typical republican president would likely boost the success of the economy. The explanatory variables are president G.W. Bush, Clinton, Reagan and Carter. I will measure their economic success within their presidential terms. The economic success during the term. This will be measured by GDP, unemployment rate, inflation rate, misery index, stock market performance, national debt.Greater economic success during the Reagan and G.W Bush administrations would prove my thesis correct while greater success within the economy during the Clinton, and Carter administrations would prove that my hypothesis is wrong. 
+How does each president have a negative or positive impact on the economy during their presidency? Typically a republican president would be assumed to make the economy more successful rather than a democratic president. Republican presidents focus more on businesses, deregulation within businesses, tax reduction and energy affordability. These traits of a typical republican president would likely boost the success of the economy. The explanatory variables are whether there was a republican president in a given year. I will measure their economic success within their presidential terms. The economic success during the term. This will be measured by GDP, unemployment rate, inflation rate, misery index, stock market performance, national debt.Greater economic success during the Reagan and G.W Bush administrations would prove my thesis correct while greater success within the economy during the Clinton, and Carter administrations would prove that my hypothesis is wrong. 
 
 
 ```{r}
@@ -26,6 +26,16 @@ my_data <- read_delim("gdpv6.txt")
 ```
 ```{r}
 head(my_data)
+```
+```{r}
+library(ggplot2)
+my_data |>
+  ggplot(mapping = aes(x = year, y = realgdp)) +
+  geom_col(fill = "steelblue") + 
+  labs(y = "GDP",
+       x = "Presidency Years",
+       title = "GDP rate per Presidency")
+
 ```
 
 
