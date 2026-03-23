@@ -10,7 +10,7 @@ output: html_document
 
 ## Project thoughts
 
-I am interested in exploring data related to the difference presidents influence has on the economy. Each president has different implementations that they make during their term and I think gathering data based on the success of each president during there term would be very interesting to compare. 
+I am interested in exploring data related to the difference presidents influence has on the economy.Each president has different implementations that they make during their term and I think gathering data based on the success of each president during there term would be very interesting to compare. 
 
 ```{r}
 library(readr)
