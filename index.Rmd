@@ -1,5 +1,5 @@
 ---
-title: "PS270 Final Project"
+title: "Who Benefits The Economy More"
 author: "Maggie McEllistrem"
 description: My final project
 output: html_document
@@ -10,7 +10,7 @@ output: html_document
 
 ## Project thoughts
 
-I am interested in exploring data related to the difference presidents influence has on the economy. Each president has different implementations that they make during their term and I think gathering data based on the success of each president during there term would be very interesting to compare. 
+I am interested in exploring data related to the difference presidential parties influence has on the economy. Each president has different implementations that they make during their term and I think gathering data based on the success of each presidential party during from 1961-2024 would be very interesting to compare.
 
 ```{r}
 library(readr)
@@ -18,27 +18,109 @@ library(readr)
 
 
 
-How does each president have a negative or positive impact on the economy during their presidency?Typically a republican president would be assumed to make the economy more successful rather than a democratic president. Republican presidents focus more on businesses, deregulation within businesses, tax reduction and energy affordability. These traits of a typical republican president would likely boost the success of the economy. The explanatory variables are whether there was a republican president in a given year. I will measure their economic success within their presidential terms. The economic success during the term. This will be measured by GDP, unemployment rate, inflation rate, misery index, stock market performance, national debt. Greater economic success during the Reagan and G.W Bush administrations would prove my thesis correct while greater success within the economy during the Clinton, and Carter administrations would prove that my hypothesis is wrong.
+Which presidential party has more positive or more negative impact on the economy during a 60 year period? Typically a republican president would be assumed to make the economy more successful rather than a democratic president. Republican presidents focus more on businesses, deregulation within businesses, tax reduction and energy affordability. These traits of a typical republican president would likely boost the success of the economy. The explanatory variable is whether there was a republican president. I will measure their economic success within their presidential parties. This will be measured by GDP, unemployment rate, inflation rate, misery index, stock market performance, national debt. Greater economic success during the Nixon, Ford, Reagan, George H.W. Bush, George W. Bush, and Trump administrations would prove my thesis correct while greater success within the economy during the Kennedy, Johnson, Carter, Clinton, Obama, and Biden administrations would prove that my hypothesis is wrong.
 
 
 ```{r}
-my_data <- read_delim("gdpv6.txt")
+my_data <- read_csv("~/Downloads/API_NY/API_NY.GDP.MKTP.KD.ZG_DS2_en_csv_v2_260.csv", skip = 3)
 ```
+
+
 ```{r}
 head(my_data)
 ```
+
 ```{r}
+library(tidyverse)
 library(ggplot2)
-my_data |>
-  ggplot(mapping = aes(x = year, y = realgdp)) +
-  geom_col(fill = "steelblue") + 
-  labs(y = "GDP",
-       x = "Presidency Years",
-       title = "GDP rate per Presidency")
+library(broom)
+```
+
+
+
+
+
+
+```{r}
+us_growth <- my_data |>
+  filter(`Country Name` == "United States") |>
+   pivot_longer(cols = `1961`:`2024`, names_to = "Year", values_to = "Growth") |>
+   mutate(year = as.numeric(Year)) |>
+   mutate(party = case_when(
+    year %in% c(1961:1963, 1963:1969, 1977:1981, 1993:2001, 2009:2017) ~ "Democrat",
+    year %in% c(1969:1974, 1974:1977, 1981:1989, 1989:1993, 2001:2009, 2017:2021 ) ~ "Republican",
+    )) |>
+  filter(party %in% c("Democrat", "Republican")) |>
+   filter(!is.na("Other"))
+
+us_growth |>
+  group_by(party) |>
+  summarize(mean_growth = mean(Growth, na.rm = TRUE)) |>
+  ggplot(aes(x = party, y = mean_growth)) +
+  geom_col(fill = "grey50", color = "white", width = 0.6) +
+  labs(
+    title = "Average GDP Growth by Party",
+    subtitle = "1961 - 2024",
+    x = "Presidential Party",
+    y = "Mean Annual GDP Growth(%)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
 
 ```
 ```{r}
-gdp_fit <- lm(`realgdp` ~ year, data = my_data)
-gdp_fit
+ us_growth <- my_data |>
+  filter(`Country Name` == "United States") |>
+   pivot_longer(cols = `1961`:`2024`, names_to = "Year", values_to = "Growth") |>
+   mutate(year = as.numeric(Year)) |>
+   filter(!is.na(Growth))
+  
+us_growth <- us_growth |>
+  mutate(party = case_when(
+    year %in% c(1961:1963, 1963:1969, 1977:1981, 1993:2001, 2009:2017) ~ "Democrat",
+    year %in% c(1969:1974, 1974:1977, 1981:1989, 1989:1993, 2001:2009, 2017:2021 ) ~ "Republican",
+    TRUE ~ "Other"
+    )) |>
+   filter(party != "Other")
+
+us_growth |>
+  ggplot(mapping = aes(x = party, y = Growth, fill = party)) +
+  geom_boxplot(color = "black", width = 0.5, alpha = 0.7) +
+  stat_summary(fun = mean, geom = "point", shape = 18, size = 4, color = "gold") +
+  scale_fill_manual(values = c("Democrat" = "blue", "Republican" = "red")) +
+  labs(y = "Annual GDP Growth(%)",
+       x = "Presidential Party",
+       fill = "party",
+       title = "GDP Growth Distribution by Presidential Party",
+       subtitle = "Years: 1961 - 2024 | Black line shows median; Gold diamond shows mean"
+       ) +
+    theme_minimal() +
+    theme(legend.position = "none")
+
 ```
-The graph shows a steady rise in GDP overall. There are drastic rises in the growth of GDP during the Reagan(1981-1989) and G.W Bush(2001-2009) administrations than during the Clinton(1993-2001) or Carter(1977-1981) administrations. Overall, from the comparison of these presidencies, republican presidents to the democratic presidents, republicans are more likely to boost the economy than democratic presidents are.
+
+```{r}
+fit <- (lm(Growth ~ party, data = us_growth))
+fit
+tidy(fit) |>
+  knitr::kable(digits = 3)
+```
+
+
+
+
+Under the Democratic presidents in my data set the average annual GDP growth was 3.29%. To get the average republican growth we would do 3.29 + (-0.551) which would be 2.74. The average growth under a republican president is then 2.74%. The standard error is 0.54 which shows that the variation between years is very high compared to the actual difference between parties. The p-value is 0.318, because this is much higher than 0.05 this means that the result is not statistically significant. There is a 31.8% chance that this difference in GDP growth happened purely by random luck. Because the p-value is greater than 0.05 we fail to reject the null hypothesis, suggesting that the observed difference is due to random changes in the economy occurring rather than it being due to the actual presidency.
+
+
+
+
+The graph shows a variation between republicans and democrats in regards to GDP percent growth. Overall, from the comparison of these presidencies, republican presidents to the democratic presidents, republicans are more likely to boost the economy than democratic presidents are.
+
+
+
+```{r print-code, ref.label=knitr::all_labels(), echo = TRUE, eval=FALSE}
+
+```
+
+
+
