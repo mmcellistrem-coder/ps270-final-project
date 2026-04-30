@@ -10,38 +10,33 @@ output: html_document
 
 ## Project thoughts
 
-I am interested in exploring data related to the difference presidential parties influence has on the economy. Each president has different implementations that they make during their term and I think gathering data based on the success of each presidential party during from 1961-2024 would be very interesting to compare.
+Part 1: Question and Hypothesis
 
-```{r}
+Do democrats or republicans have a more positive impact on the economy's percent GDP during a 64 year period? Typically a Republican president would be assumed to make the economy more successful rather than a Democratic president. Republican presidents focus more on businesses, deregulation within businesses, tax reduction and energy affordability. These traits of a typical Republican president would likely boost the success of the economy. Therefore, my hypothesis is that a Republican president is more likely to have a positive impact on the economy than a Democratic president during the 64 year period my data is collected from. 
+
+Greater economic success during the Nixon, Ford, Reagan, George H.W. Bush, George W. Bush, and Trump administrations would prove my thesis correct. While, greater success within the economy during the Kennedy, Johnson, Carter, Clinton, Obama, and Biden administrations would prove that my hypothesis is incorrect. This is an important hypothesis to test because it helps voters understand which presidential party did a better job at helping boost the economy in the past. The growth and health of the economy is a very important factor for many voters when choosing which political party to vote for. It is important to do this type of test because forming a simple graph may be misleading or coincidental. We need to do a hypothesis test in order to find out if there is an actual difference in the economies growth between Republicans and Democrats to make sure that a certain outcome is not just due to random chance. 
+
+
+
+Part 2: Data
+
+The data used in my experiment is compiled by the World Bank and is gathered from National Statistical Offices. The explanatory/predictor variable in my experiment is whether there was a Republican president. The response/outcome variable is the economic performance of the Republican president which will be measured in percent GDP. My data will cover the annual GDP growth percentage. In order to evaluate weather my hypothesis is true or not I will use a two-sample t-test to compare the average GDP growth rate between Republicans and Democrats. My null hypothesis is that there is no difference in mean GDP growth between Republican and Democratic parties. While my hypothesis is that the republican party on average has a higher average GDP and therefore a more positive impact on the economy.  
+
+If the p-value from the two-sample t-test is less than or equal to 0.05, the null hypothesis will be rejected, and my hypothesis that the republican party has a higher average GDP will be supported. If the p-value in this test is greater than 0.05 the null hypothesis will fail to be rejected, that there is no difference in mean GDP growth between Republicans and Democrats. This would mean that there is not enough evidence supporting my hypothesis to accept that Republicans benefit the economy more.  
+
+```{r, include = FALSE}
 library(readr)
 ```
-
-
-
-Which presidential party has more positive or more negative impact on the economy during a 60 year period? Typically a republican president would be assumed to make the economy more successful rather than a democratic president. Republican presidents focus more on businesses, deregulation within businesses, tax reduction and energy affordability. These traits of a typical republican president would likely boost the success of the economy. The explanatory variable is whether there was a republican president. I will measure their economic success within their presidential parties. This will be measured by GDP, unemployment rate, inflation rate, misery index, stock market performance, national debt. Greater economic success during the Nixon, Ford, Reagan, George H.W. Bush, George W. Bush, and Trump administrations would prove my thesis correct while greater success within the economy during the Kennedy, Johnson, Carter, Clinton, Obama, and Biden administrations would prove that my hypothesis is wrong.
-
-
 ```{r}
 my_data <- read_csv("~/Downloads/API_NY/API_NY.GDP.MKTP.KD.ZG_DS2_en_csv_v2_260.csv", skip = 3)
 ```
 
-
-```{r}
-head(my_data)
-```
-
-```{r}
+```{r, echo=FALSE}
 library(tidyverse)
 library(ggplot2)
 library(broom)
 ```
-
-
-
-
-
-
-```{r}
+```{r, echo= FALSE}
 us_growth <- my_data |>
   filter(`Country Name` == "United States") |>
    pivot_longer(cols = `1961`:`2024`, names_to = "Year", values_to = "Growth") |>
@@ -68,7 +63,11 @@ us_growth |>
   theme(legend.position = "none")
 
 ```
-```{r}
+
+
+
+Part 3: Results
+```{r, echo=FALSE}
  us_growth <- my_data |>
   filter(`Country Name` == "United States") |>
    pivot_longer(cols = `1961`:`2024`, names_to = "Year", values_to = "Growth") |>
@@ -99,22 +98,26 @@ us_growth |>
 
 ```
 
-```{r}
+```{r, echo = FALSE}
 fit <- (lm(Growth ~ party, data = us_growth))
 fit
 tidy(fit) |>
   knitr::kable(digits = 3)
 ```
+Analysis of Results: 
+
+For the box plot the median which is the black line and the mean which is the gold diamond are both higher for Democrats than they are for Republicans. Both parties show a similar interquartile range, but the Republican parties lower end of the box is a bit lower than the Democrats. The Republican parties box is a bit lower than the Democrats, but both of the boxes mostly overlap which shows they are not that different. 
+Under the Democratic presidents in my data set the average annual GDP growth was 3.29%. To get the average Republican growth we would do 3.29 + (-0.551) which would be 2.74%. The average growth under a Republican president is then 2.74%. So on average GDP growth during Republican administrations is 0.551 percentage points less than Democratic administrations. -0.551 is our main coefficient of interest because it is the difference in Republicans GDP percent. The standard error is 0.54 which shows that the variation between years is very high compared to the actual difference between parties. This high standard error shows that there is a high degree of uncertainty.
+
+The p-value is 0.318, because this is much higher than 0.05 this means that the my result is not statistically significant. There is a 31.8% chance that this difference in GDP growth percent happened purely by random luck. Because the p-value is greater than 0.05 we fail to reject the null hypothesis. This means the observed difference in Democrats and Republicans economic success is likely due to random changes in the economy occurring rather than it being due to the actual presidency.
+
+The difference in means of GDP between democrats and republicans is 0.55 which is substantively meaningful. This is substantively meaningful because this is a difference of billions of dollars of economic activity between the growth of Democrats and Republican parties. But, this is not statistically significant because of our large p-value. We should not interpret our results that Republican policies cause lower GDP growth than Democrats causally. We should not interpret these results causally because of multiple confounding variables that could have impacted the results of the experiment. Some confounding variables may be that the state of the economy can drive who wins an election therefore our data would be skewed. Another may be the economic policies that are put in place by one president can have effects later on that isn't during the time of their parties presidency.There may be many other reasons the economy could be effected due to a factor besides the president at the time. 
 
 
 
+Part 4: Conclusion
 
-Under the Democratic presidents in my data set the average annual GDP growth was 3.29%. To get the average republican growth we would do 3.29 + (-0.551) which would be 2.74. The average growth under a republican president is then 2.74%. The standard error is 0.54 which shows that the variation between years is very high compared to the actual difference between parties. The p-value is 0.318, because this is much higher than 0.05 this means that the result is not statistically significant. There is a 31.8% chance that this difference in GDP growth happened purely by random luck. Because the p-value is greater than 0.05 we fail to reject the null hypothesis, suggesting that the observed difference is due to random changes in the economy occurring rather than it being due to the actual presidency.
-
-
-
-
-The graph shows a variation between republicans and democrats in regards to GDP percent growth. Overall, from the comparison of these presidencies, republican presidents to the democratic presidents, republicans are more likely to boost the economy than democratic presidents are.
+While my data shows that the Democratic party experiences higher average annual GDP percent growth of 3.29% compared to the Republican party which is 2.74% which is 0.551 percentage points less than the Democratic party, it is not statistically significant because the p-value is greater than 0.05. Therefore, there is not evidence to support my hypothesis that the Republican party benefits the economy more than the Democratic party within this 64 year period. Some limitations of this test is that it does not account for confounding variables like the time that it takes for a presidents policy to go in effect, and changes within the Federal Reserve's interest rates or global economic shocks like the 2008 crises or COVID and more. Another limitation is that the sample size is small and it does not go over as much data as it could to get a more accurate result. If I had more time and money to do this experiment I would probably use a model that was able to capture the effects of the economy due to the delay that occurs when a president incorporates a new economic policy. I would also add control variables to improve my results like, global economic health, and decisions from congress on economic policy that may effect the economy. Another way that I could improve my analysis would be to increase my number of observations. To improve the sample size I would include times further back, likely starting in about 1900. I would also use quarterly GDP updates so that I could increase my sample size even more. 
 
 
 
